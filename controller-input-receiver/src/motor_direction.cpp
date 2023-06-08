@@ -27,8 +27,8 @@ void Motor_Direction::forward(Track_Motor& motor_one, Track_Motor& motor_two, Tr
 
 void Motor_Direction::backward(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three, unsigned int speed)
 {
-    motor_one.spin_motor(speed, 0);
-    motor_two.spin_motor(speed, 0);
+    motor_one.spin_motor(speed, 1);
+    motor_two.spin_motor(speed, 1);
     motor_three.spin_motor(0, 0);
 }
 
@@ -41,9 +41,9 @@ void Motor_Direction::right(Track_Motor& motor_one, Track_Motor& motor_two, Trac
 
 void Motor_Direction::left(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three, unsigned int speed)
 {
-    motor_one.spin_motor(0, speed);
-    motor_two.spin_motor(0, speed);
-    motor_three.spin_motor(0, speed * 0.66);
+    motor_one.spin_motor(speed, 1);
+    motor_two.spin_motor(speed, 1);
+    motor_three.spin_motor(speed * 0.66, 1);
 }
 
 int Motor_Direction::y()
