@@ -63,41 +63,43 @@ void loop()
             // Get ranges between x and y min and max.
             int* y_range = motor_direction.min_max_y();
             int* x_range = motor_direction.min_max_x();
+            // get one and only instance of Speed_meter object.
+            Speed_Meter* speed_meter = Speed_Meter::get_instance();
 
             // Joystick is moving forward, turn on motor 1 clockwise and motor 3 clockwise. Keep motor 2 off.
             if ((x > x_range[0] && x < x_range[1]) && (y >= y_range[1]))
             {
                 // Set speed with given analog value.
-                Speed_Meter::set_speed(y);
+                speed_meter->set_speed(y);
                 // Move robot forward.
-                motor_direction.forward(track_motor_one, track_motor_two, track_motor_three, Speed_Meter::get_speed());
+                motor_direction.forward(track_motor_one, track_motor_two, track_motor_three, speed_meter->get_speed());
             }
 
             // Joystick is moving backward, turn on motor 1 counterclockwise and motor 3 counterclockwise. Keep motor 2 off.
             if ((x > x_range[0] && x < x_range[1]) && (y <= y_range[0]))
             {
                 // Set speed with given analog value.
-                Speed_Meter::set_speed(y);
+                speed_meter->set_speed(y);
                 // Move robot backward.
-                motor_direction.backward(track_motor_one, track_motor_two, track_motor_three, Speed_Meter::get_speed());
+                motor_direction.backward(track_motor_one, track_motor_two, track_motor_three, speed_meter->get_speed());
             }
 
             // Joystick is moving right, turn on all motors clockwise but spin motor 1 0.66 times the speed.
             if ((x >= x_range[1]) && (y > y_range[0] && y < y_range[1]))
             {
                 // Set speed with given analog value.
-                Speed_Meter::set_speed(x);
+                speed_meter->set_speed(x);
                 // Move robot to the right.
-                motor_direction.right(track_motor_one, track_motor_two, track_motor_three, Speed_Meter::get_speed());
+                motor_direction.right(track_motor_one, track_motor_two, track_motor_three, speed_meter->get_speed());
             }
 
             // Joystick is moving left, turn on all motors counterclockwise but spin motor 3 0.66 times the speed.
             if ((x < x_range[0]) && ((y > y_range[0] && y < y_range[1])))
             {
                 // Set speed with given analog value.
-                Speed_Meter::set_speed(x);
+                speed_meter->set_speed(x);
                 // Move robot to the left.
-                motor_direction.left(track_motor_one, track_motor_two, track_motor_three, Speed_Meter::get_speed());
+                motor_direction.left(track_motor_one, track_motor_two, track_motor_three, speed_meter->get_speed());
             }
 
             // Set track motor values back to zero.
