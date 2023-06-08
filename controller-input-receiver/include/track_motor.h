@@ -5,6 +5,8 @@
 #ifndef CONTROLLER_INPUT_RECEIVER_TRACK_MOTOR_H
 #define CONTROLLER_INPUT_RECEIVER_TRACK_MOTOR_H
 
+#include <stdint.h>
+
 /**
  * Controls the direction of the track motor.
  */
@@ -24,6 +26,18 @@ public:
      * @param direction 0 for clockwise, 1 for counterclockwise.
      */
     void spin_motor(unsigned int speed, unsigned int direction);
+
+    /**
+     * Return connected pin a.
+     * @return connected motor pin a.
+     */
+    inline unsigned int get_pin_a() const { return pin_a; };
+
+    /**
+     * Return connected pin b.
+     * @return connected motor pin b.
+     */
+    inline unsigned int get_pin_b() const { return pin_b; };
 private:
     /**
      * First connected pin value.
