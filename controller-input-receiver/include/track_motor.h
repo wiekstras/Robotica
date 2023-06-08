@@ -1,12 +1,13 @@
 //
 // Created by ruben on 6/5/23.
-// In this file the trackmotor
 //
 
 #ifndef CONTROLLER_INPUT_RECEIVER_TRACK_MOTOR_H
 #define CONTROLLER_INPUT_RECEIVER_TRACK_MOTOR_H
 
-
+/**
+ * Controls the direction of the track motor.
+ */
 class Track_Motor
 {
 public:
@@ -34,6 +35,5 @@ private:
      */
     unsigned int pin_b;
 };
-
 
 #endif //CONTROLLER_INPUT_RECEIVER_TRACK_MOTOR_H

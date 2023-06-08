@@ -24,32 +24,32 @@ public:
 
     /**
      * Sets the incoming x and y controller values.
-     * @param incomingX
-     * @param incomingY
+     * @param incomingX received analog x value.
+     * @param incomingY received analog y value.
      */
     void set_incoming_values(int incomingX, int incomingY);
 
     /**
-     *
-     * @return
+     * Gets the analog y value.
+     * @return analog y value.
      */
     int y();
 
     /**
-     *
-     * @return
+     * Gets the analog x value.
+     * @return analog x value.
      */
     int x();
 
     /**
-     *
-     * @return
+     * Gets the min and max y value.
+     * @return a pointer to an array holding the min and max y value.
      */
     int* min_max_y() const;
 
     /**
-     *
-     * @return
+     * Gets the min and max x value.
+     * @return a pointer to an array holding the min and max x value.
      */
     int* min_max_x() const;
 
@@ -86,9 +86,7 @@ public:
     void left(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three, unsigned int speed);
 
 private:
-    /**
-     * Declare min, max, and incoming values to decide the direction of the joystick based on analog values.
-     */
+    // Declare min, max, and incoming values to decide the direction of the joystick based on analog values.
     int y_value_min, y_value_max, x_value_min, x_value_max, incoming_x{}, incoming_y{};
 };
 

@@ -7,7 +7,9 @@
 #ifndef CONTROLLER_INPUT_RECEIVER_SPEED_METER_H
 #define CONTROLLER_INPUT_RECEIVER_SPEED_METER_H
 
-
+/**
+ * Controls the speed of the track motors.
+ */
 class Speed_Meter
 {
 public:
@@ -19,7 +21,7 @@ public:
 
     /**
      * Gets the current speed of the track motor.
-     * @return
+     * @return speed of track motor
      */
     static unsigned int get_speed();
 };
