@@ -1,6 +1,10 @@
 #include <Arduino.h>
 #include "speed_meter.h"
 
+// define static member variables.
+Speed_Meter* Speed_Meter::speed_meter = nullptr;
+int Speed_Meter::speed = 0;
+
 Speed_Meter* Speed_Meter::get_instance()
 {
     if (speed_meter == nullptr)
@@ -13,7 +17,7 @@ Speed_Meter* Speed_Meter::get_instance()
 
 void Speed_Meter::set_speed(unsigned int analogValue)
 {
-    speed = map(analogValue, 0, 1023, 0, 255);
+    speed = map(analogValue, 0, 15, 0, 255);
 }
 
 unsigned int Speed_Meter::get_speed()

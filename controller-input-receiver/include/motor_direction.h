@@ -14,20 +14,24 @@ class Motor_Direction
 {
 public:
     /**
-     * Set the min and max value range of the read analog values.
-     * @param yValueMin min-y value
-     * @param y_value_max max-y value
-     * @param x_value_min min-x value
-     * @param x_value_max max-x value
+     * Prevent object from being cloned.
+     * @param Motor_Direction object.
      */
-    Motor_Direction (int yValueMin, int yValueMax, int xValueMin, int xValueMax);
+    Motor_Direction(Motor_Direction &other) = delete;
 
     /**
-     * Sets the incoming x and y controller values.
-     * @param incomingX received analog x value.
-     * @param incomingY received analog y value.
+     * Prevent object from being assigned.
      */
-    void set_incoming_values(int incomingX, int incomingY);
+    void operator=(const Motor_Direction&) = delete;
+
+    /**
+     * Get instance.
+     */
+    static Motor_Direction* get_instance(int yValueMin, int yValueMax, int xValueMin, int xValueMax);
+
+    void set_x(int incomingX);
+
+    void set_y(int incomingY);
 
     /**
      * Gets the analog y value.
@@ -41,17 +45,10 @@ public:
      */
     int x();
 
-    /**
-     * Gets the min and max y value.
-     * @return a pointer to an array holding the min and max y value.
-     */
-    int* min_max_y() const;
-
-    /**
-     * Gets the min and max x value.
-     * @return a pointer to an array holding the min and max x value.
-     */
-    int* min_max_x() const;
+    int get_min_y() const;
+    int get_max_y() const;
+    int get_min_x() const;
+    int get_max_x() const;
 
     /**
      * Move robot forward.
@@ -86,8 +83,28 @@ public:
     void left(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three, unsigned int speed);
 
 private:
+    /**
+     * Set the min and max value range of the read analog values.
+     * @param yValueMin min-y value
+     * @param y_value_max max-y value
+     * @param x_value_min min-x value
+     * @param x_value_max max-x value
+     */
+    Motor_Direction (int yValueMin, int yValueMax, int xValueMin, int xValueMax)
+    {
+        y_value_min = yValueMin;
+        y_value_max = yValueMax;
+        x_value_min = xValueMin;
+        x_value_max = xValueMax;
+    };
+
+    /**
+    * Represents the singleton instance of Motor_Direction.
+    */
+    static Motor_Direction* motor_direction;
+
     // Declare min, max, and incoming values to decide the direction of the joystick based on analog values.
-    int y_value_min, y_value_max, x_value_min, x_value_max, incoming_x{}, incoming_y{};
+    int y_value_min, y_value_max, x_value_min, x_value_max, incoming_x = 0, incoming_y = 0;
 };
 
 

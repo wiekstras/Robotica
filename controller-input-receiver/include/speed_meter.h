@@ -52,8 +52,4 @@ private:
     Speed_Meter(){};
 };
 
-Speed_Meter* Speed_Meter::speed_meter = nullptr;
-
-int Speed_Meter::speed = 100;
-
 #endif //CONTROLLER_INPUT_RECEIVER_SPEED_METER_H

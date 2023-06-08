@@ -4,17 +4,25 @@
 
 #include "motor_direction.h"
 
-Motor_Direction::Motor_Direction(int yValueMin, int yValueMax, int xValueMin, int xValueMax)
+Motor_Direction* Motor_Direction::motor_direction = nullptr;
+
+Motor_Direction* Motor_Direction::get_instance(int yValueMin, int yValueMax, int xValueMin, int xValueMax)
 {
-    y_value_min = yValueMin;
-    y_value_max = yValueMax;
-    x_value_min = xValueMin;
-    x_value_max = xValueMax;
+    if (motor_direction == nullptr)
+    {
+        motor_direction = new Motor_Direction(yValueMin, yValueMax, xValueMin, xValueMax);
+    }
+
+    return motor_direction;
 }
 
-void Motor_Direction::set_incoming_values(int incomingX, int incomingY)
+void Motor_Direction::set_x(int incomingX)
 {
     incoming_x = incomingX;
+}
+
+void Motor_Direction::set_y(int incomingY)
+{
     incoming_y = incomingY;
 }
 
@@ -56,18 +64,22 @@ int Motor_Direction::x()
     return incoming_x;
 }
 
-int *Motor_Direction::min_max_y() const
+int Motor_Direction::get_min_y() const
 {
-    int* arr = new int[2];
-    arr[0] = y_value_min;
-    arr[1] = y_value_max;
-    return arr;
+    return y_value_min;
 }
 
-int *Motor_Direction::min_max_x() const
+int Motor_Direction::get_max_y() const
 {
-    int* arr = new int[2];
-    arr[0] = x_value_min;
-    arr[1] = x_value_max;
-    return arr;
+    return y_value_max;
+}
+
+int Motor_Direction::get_min_x() const
+{
+    return x_value_min;
+}
+
+int Motor_Direction::get_max_x() const
+{
+    return x_value_max;
 }
