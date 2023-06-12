@@ -15,11 +15,11 @@ void Track_Motor::spin_motor( int speed,  int direction)
 {
     if (direction == 0) // Clockwise.
     {
-        analogWrite(pin_a, speed);
-        analogWrite(pin_b, 0);
-    } else if (direction == 1) // Counterclockwise.
-    {
         analogWrite(pin_a, 0);
         analogWrite(pin_b, speed);
+    } else if (direction == 1) // Counterclockwise.
+    {
+        analogWrite(pin_a, speed);
+        analogWrite(pin_b, 0);
     }
 }

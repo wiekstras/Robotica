@@ -90,6 +90,8 @@ public:
      */
     void not_moving(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three);
 
+    void rotate(Track_Motor &motor_one, Track_Motor &motor_two, Track_Motor &motor_three, int speed, int direction);
+
 private:
     /**
      * Set the min and max value range of the read analog values.
