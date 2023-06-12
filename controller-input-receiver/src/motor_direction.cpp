@@ -46,16 +46,23 @@ void Motor_Direction::backward(Track_Motor& motor_one, Track_Motor& motor_two, T
 
 void Motor_Direction::right(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three, int speed)
 {
-    motor_one.spin_motor(speed * 0.66, 0);
-    motor_two.spin_motor(speed, 0);
-    motor_three.spin_motor(speed, 0);
+    motor_one.spin_motor(speed, 1);
+    motor_two.spin_motor(speed * 0.66, 1);
+    motor_three.spin_motor(speed, 1);
 }
 
 void Motor_Direction::left(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three, int speed)
 {
-    motor_one.spin_motor(speed, 1);
-    motor_two.spin_motor(speed, 1);
-    motor_three.spin_motor(speed * 0.66, 1);
+    motor_one.spin_motor(speed, 0);
+    motor_two.spin_motor(speed, 0);
+    motor_three.spin_motor(speed * 0.66, 0);
+}
+
+void Motor_Direction::rotate(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three, int speed, int direction)
+{
+    motor_one.spin_motor(speed, direction);
+    motor_two.spin_motor(speed, direction);
+    motor_three.spin_motor(speed, direction);
 }
 
 void Motor_Direction::not_moving(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three)

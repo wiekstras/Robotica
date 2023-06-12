@@ -52,7 +52,9 @@ void setup()
  */
 void loop()
 {
-    while (xBee.available()){
+    joymove = 0;
+    while (xBee.available())
+    {
         Serial.println(track_motor_one.get_pin_a());
         Serial.println(track_motor_one.get_pin_b());
 
@@ -60,7 +62,8 @@ void loop()
         incomingInt = xBee.read();
         Serial.print("Something is coming! Value: ");
         Serial.println(incomingInt);
-        switch(incomingInt){
+        switch (incomingInt)
+        {
             case 16 ... 31: //0001 XXXX, JOYSTICK X VALUE
                 motor_direction->set_y(incomingInt - 16);
                 joymove = 1;
@@ -94,8 +97,10 @@ void loop()
                 break;
 
             case 96 ... 111: //0110 1/2/3/4, BUTTONS 1-4 VALUES
-                for (int i = 0; i < 4; i++){
-                    buttonarray[i] = (incomingInt - 96)>>i%4 & 1; //afbouwen van de waardes die we versturen. Bits shiften x4 om de waardes weer er uit te halen.
+                for (int i = 0; i < 4; i++)
+                {
+                    buttonarray[i] = (incomingInt - 96) >> i % 4 &
+                                     1; //afbouwen van de waardes die we versturen. Bits shiften x4 om de waardes weer er uit te halen.
                     Serial.print("Button:");
                     Serial.print(i);
                     Serial.print("  Value:");
@@ -104,8 +109,10 @@ void loop()
                 break;
 
             case 112 ... 127: //0111 5/6/7/8, BUTTONS 5-8 VALUES
-                for (int i = 4; i < 8; i++){
-                    buttonarray[i] = (incomingInt - 112)>>i%4 & 1; //afbouwen van de waardes die we versturen. Bits shiften x4 om de waardes weer er uit te halen.
+                for (int i = 4; i < 8; i++)
+                {
+                    buttonarray[i] = (incomingInt - 112) >> i % 4 &
+                                     1; //afbouwen van de waardes die we versturen. Bits shiften x4 om de waardes weer er uit te halen.
                     Serial.print("Button:");
                     Serial.print(i);
                     Serial.print("  Value:");
@@ -114,8 +121,10 @@ void loop()
                 break;
 
             case 128 ... 143: // 1000 9/10/11/12, BUTTONS 9-12 VALUES
-                for (int i = 8; i < 12; i++){
-                    buttonarray[i] = (incomingInt - 128)>>i%4 & 1; //afbouwen van de waardes die we versturen. Bits shiften x4 om de waardes weer er uit te halen.
+                for (int i = 8; i < 12; i++)
+                {
+                    buttonarray[i] = (incomingInt - 128) >> i % 4 &
+                                     1; //afbouwen van de waardes die we versturen. Bits shiften x4 om de waardes weer er uit te halen.
                     Serial.print("Button:");
                     Serial.print(i);
                     Serial.print("  Value:");
@@ -124,8 +133,10 @@ void loop()
                 break;
 
             case 144 ... 159: //1001 13/13/13/13, BUTTON 13 VALUE (X4)
-                for (int i = 12; i < 16; i++){
-                    buttonarray[i] = (incomingInt - 144)>>i%4 & 1; //afbouwen van de waardes die we versturen. Bits shiften x4 om de waardes weer er uit te halen.
+                for (int i = 12; i < 16; i++)
+                {
+                    buttonarray[i] = (incomingInt - 144) >> i % 4 &
+                                     1; //afbouwen van de waardes die we versturen. Bits shiften x4 om de waardes weer er uit te halen.
                     Serial.print("Button:");
                     Serial.print(i);
                     Serial.print("  Value:");
@@ -146,40 +157,41 @@ void loop()
 
     speed_meter->set_speed(speedpot);
 
-    int speed = speed_meter->get_speed();
+    int speed = map(speedpot, 0, 15, 0, 255);
 
-    // Joystick is moving.
-    if (joymove == 1)
-    {
+
         // Joystick is moving forward, turn on motor 1 clockwise and motor 3 clockwise. Keep motor 2 off.
         if ((x > min_x && x < max_x) && (y >= max_y))
         {
             // Move robot forward.
-            motor_direction->forward(track_motor_one, track_motor_two, track_motor_three, speed);
+            motor_direction->forward(track_motor_one, track_motor_two, track_motor_three, 255);
         }
 
         // Joystick is moving backward, turn on motor 1 counterclockwise and motor 3 counterclockwise. Keep motor 2 off.
         if ((x > min_x && x < max_x) && (y <= min_y))
         {
-            motor_direction->backward(track_motor_one, track_motor_two, track_motor_three, speed);
+            motor_direction->backward(track_motor_one, track_motor_two, track_motor_three, 255);
         }
 
         // Joystick is moving right, turn on all motors clockwise but spin motor 1 0.66 times the speed.
         if ((x >= max_x) && (y > min_y && y < max_y))
         {
-            motor_direction->right(track_motor_one, track_motor_two, track_motor_three, speed);
+            motor_direction->right(track_motor_one, track_motor_two, track_motor_three, 255);
         }
 
         // Joystick is moving left, turn on all motors counterclockwise but spin motor 3 0.66 times the speed.
-        if ((x < min_x) && ((y > max_y && y < max_y)))
+        if ((x < min_x) && ((y > min_y && y < max_y)))
         {
-            motor_direction->left(track_motor_one, track_motor_two, track_motor_three, speed);
+            motor_direction->left(track_motor_one, track_motor_two, track_motor_three, 255);
         }
 
-        joymove = 0;
-    }
-    else
-    {
-        motor_direction->not_moving(track_motor_one, track_motor_two, track_motor_three);
-    }
+        // rotation code here
+        // ...
+
+        // Joystick is not moving, turn all motors off.
+        if ((y >= min_y && y <= max_y) && (x >= min_x && x <= max_x))
+        {
+            //   Serial.println("Joystick is not moving.");
+            motor_direction->not_moving(track_motor_one, track_motor_two, track_motor_three);
+        }
 }
