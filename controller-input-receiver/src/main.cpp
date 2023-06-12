@@ -19,9 +19,12 @@ int speedpot;
 int buttonarray[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 // Create the motor objects.
-Track_Motor track_motor_one(7, 8);
-Track_Motor track_motor_two(A3, 6);
-Track_Motor track_motor_three(A1, A2);
+Track_Motor track_motor_one(A1, A2);
+Track_Motor track_motor_two(6, A3);
+Track_Motor track_motor_three(7, 8);
+
+// get one and only instance of Speed_meter object.
+Speed_Meter* speed_meter = Speed_Meter::get_instance();
 
 // Used to check if incoming data is received.
 bool received_numbers = false;
@@ -33,6 +36,8 @@ void setup()
 {
     xBee.begin(38400);
     Serial.begin(38400);
+    pinMode(rxPin, INPUT);
+    pinMode(txPin, OUTPUT);
     // Set connected track motor pins as output.
     pinMode(track_motor_one.get_pin_a(), OUTPUT);
     pinMode(track_motor_one.get_pin_b(), OUTPUT);
@@ -47,21 +52,24 @@ void setup()
  */
 void loop()
 {
-    //while (xBee.available()){
+    while (xBee.available()){
+        Serial.println(track_motor_one.get_pin_a());
+        Serial.println(track_motor_one.get_pin_b());
+
         int incomingInt;
         incomingInt = xBee.read();
         Serial.print("Something is coming! Value: ");
         Serial.println(incomingInt);
         switch(incomingInt){
             case 16 ... 31: //0001 XXXX, JOYSTICK X VALUE
-                motor_direction->set_x(incomingInt - 16);
+                motor_direction->set_y(incomingInt - 16);
                 joymove = 1;
                 Serial.print("X: ");
                 Serial.println(motor_direction->x());
                 break;
 
             case 32 ... 47://0010 XXXX, JOYSTICK Y VALUE
-                motor_direction->set_y(incomingInt - 32);
+                motor_direction->set_x(incomingInt - 32);
                 joymove = 1;
                 Serial.print("Y: ");
                 Serial.println(motor_direction->y());
@@ -127,10 +135,7 @@ void loop()
             default: //do nothing
                 break;
         }
-    //}
-
-    // get one and only instance of Speed_meter object.
-    Speed_Meter* speed_meter = Speed_Meter::get_instance();
+    }
 
     int x = motor_direction->x();
     int y = motor_direction->y();
@@ -139,39 +144,42 @@ void loop()
     int min_y = motor_direction->get_min_y();
     int max_y = motor_direction->get_max_y();
 
-    // Joystick is moving forward, turn on motor 1 clockwise and motor 3 clockwise. Keep motor 2 off.
-    if ((x > min_x && x < max_x) && (y >= max_y))
-    {
-        // Set speed with given analog value.
-        speed_meter->set_speed(y);
-        // Move robot forward.
-        motor_direction->forward(track_motor_one, track_motor_two, track_motor_three, speed_meter->get_speed());
-    }
+    speed_meter->set_speed(speedpot);
 
-    // Joystick is moving backward, turn on motor 1 counterclockwise and motor 3 counterclockwise. Keep motor 2 off.
-    if ((x > min_x && x < max_x) && (y <= min_x))
-    {
-        // Set speed with given analog value.
-        speed_meter->set_speed(y);
-        // Move robot backward.
-        motor_direction->backward(track_motor_one, track_motor_two, track_motor_three, speed_meter->get_speed());
-    }
+    int speed = speed_meter->get_speed();
 
-    // Joystick is moving right, turn on all motors clockwise but spin motor 1 0.66 times the speed.
-    if ((x >= max_x) && (y > min_y && y < max_y))
+    // Joystick is moving.
+    if (joymove == 1)
     {
-        // Set speed with given analog value.
-        speed_meter->set_speed(x);
-        // Move robot to the right.
-        motor_direction->right(track_motor_one, track_motor_two, track_motor_three, speed_meter->get_speed());
-    }
+        // Joystick is moving forward, turn on motor 1 clockwise and motor 3 clockwise. Keep motor 2 off.
+        if ((x > min_x && x < max_x) && (y >= max_y))
+        {
+            // Move robot forward.
+            motor_direction->forward(track_motor_one, track_motor_two, track_motor_three, speed);
+        }
 
-    // Joystick is moving left, turn on all motors counterclockwise but spin motor 3 0.66 times the speed.
-    if ((x < min_x) && ((y > max_y && y < max_y)))
+        // Joystick is moving backward, turn on motor 1 counterclockwise and motor 3 counterclockwise. Keep motor 2 off.
+        if ((x > min_x && x < max_x) && (y <= min_y))
+        {
+            motor_direction->backward(track_motor_one, track_motor_two, track_motor_three, speed);
+        }
+
+        // Joystick is moving right, turn on all motors clockwise but spin motor 1 0.66 times the speed.
+        if ((x >= max_x) && (y > min_y && y < max_y))
+        {
+            motor_direction->right(track_motor_one, track_motor_two, track_motor_three, speed);
+        }
+
+        // Joystick is moving left, turn on all motors counterclockwise but spin motor 3 0.66 times the speed.
+        if ((x < min_x) && ((y > max_y && y < max_y)))
+        {
+            motor_direction->left(track_motor_one, track_motor_two, track_motor_three, speed);
+        }
+
+        joymove = 0;
+    }
+    else
     {
-        // Set speed with given analog value.
-        speed_meter->set_speed(x);
-        // Move robot to the left.
-        motor_direction->left(track_motor_one, track_motor_two, track_motor_three, speed_meter->get_speed());
+        motor_direction->not_moving(track_motor_one, track_motor_two, track_motor_three);
     }
 }

@@ -2,6 +2,7 @@
 // Created by ruben on 6/6/23.
 //
 
+#include <HardwareSerial.h>
 #include "motor_direction.h"
 
 Motor_Direction* Motor_Direction::motor_direction = nullptr;
@@ -26,32 +27,42 @@ void Motor_Direction::set_y(int incomingY)
     incoming_y = incomingY;
 }
 
-void Motor_Direction::forward(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three, unsigned int speed)
+void Motor_Direction::forward(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three, int speed)
 {
+    /*Serial.println("snelheid: ");
+    Serial.println(speed);*/
+
     motor_one.spin_motor(speed, 0);
-    motor_two.spin_motor(speed, 0);
-    motor_three.spin_motor(0, 0);
+    motor_two.spin_motor(0, 0);
+    motor_three.spin_motor(speed, 0);
 }
 
-void Motor_Direction::backward(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three, unsigned int speed)
+void Motor_Direction::backward(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three, int speed)
 {
     motor_one.spin_motor(speed, 1);
-    motor_two.spin_motor(speed, 1);
-    motor_three.spin_motor(0, 0);
+    motor_two.spin_motor(0, 1);
+    motor_three.spin_motor(speed, 1);
 }
 
-void Motor_Direction::right(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three, unsigned int speed)
+void Motor_Direction::right(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three, int speed)
 {
     motor_one.spin_motor(speed * 0.66, 0);
     motor_two.spin_motor(speed, 0);
     motor_three.spin_motor(speed, 0);
 }
 
-void Motor_Direction::left(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three, unsigned int speed)
+void Motor_Direction::left(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three, int speed)
 {
     motor_one.spin_motor(speed, 1);
     motor_two.spin_motor(speed, 1);
     motor_three.spin_motor(speed * 0.66, 1);
+}
+
+void Motor_Direction::not_moving(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three)
+{
+    motor_one.spin_motor(0, 0);
+    motor_two.spin_motor(0, 0);
+    motor_three.spin_motor(0, 0);
 }
 
 int Motor_Direction::y()

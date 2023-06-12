@@ -56,7 +56,7 @@ public:
      * @param motor_two Second motor.
      * @param motor_three Third motor.
      */
-    void forward(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three, unsigned int speed);
+    void forward(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three, int speed);
 
     /**
      * Move robot backward.
@@ -64,7 +64,7 @@ public:
      * @param motor_two Second motor.
      * @param motor_three Third motor.
      */
-    void backward(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three, unsigned int speed);
+    void backward(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three, int speed);
 
     /**
      * Move robot right.
@@ -72,7 +72,7 @@ public:
      * @param motor_two Second motor.
      * @param motor_three Third motor.
      */
-    void right(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three, unsigned int speed);
+    void right(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three, int speed);
 
     /**
      * Move robot left.
@@ -80,7 +80,15 @@ public:
      * @param motor_two Second motor.
      * @param motor_three Third motor.
      */
-    void left(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three, unsigned int speed);
+    void left(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three, int speed);
+
+    /**
+     * Turn motors off
+     * @param motor_one First motor.
+     * @param motor_two Second motor.
+     * @param motor_three Third motor.
+     */
+    void not_moving(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three);
 
 private:
     /**
