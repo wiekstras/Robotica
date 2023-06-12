@@ -27,13 +27,13 @@ public:
      * Sets the speed of the track motor.
      * @param analog_value Value that is read from the connected pins.
      */
-    void set_speed(unsigned int analog_value);
+    void set_speed(int analog_value);
 
     /**
      * Gets the current speed of the track motor.
      * @return speed of track motor
      */
-    unsigned int get_speed();
+    int get_speed();
 
 private:
     /**
@@ -44,7 +44,7 @@ private:
     /**
      *
      */
-    static int speed;
+    int speed;
 
     /**
      * Declare constructor private, preventing direct construction calls.
