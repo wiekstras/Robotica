@@ -55,9 +55,6 @@ void loop()
     joymove = 0;
     while (xBee.available())
     {
-        Serial.println(track_motor_one.get_pin_a());
-        Serial.println(track_motor_one.get_pin_b());
-
         int incomingInt;
         incomingInt = xBee.read();
         Serial.print("Something is coming! Value: ");
@@ -157,41 +154,53 @@ void loop()
 
     speed_meter->set_speed(speedpot);
 
-    int speed = map(speedpot, 0, 15, 0, 255);
+    // Joystick is moving forward, turn on motor 1 clockwise and motor 3 clockwise. Keep motor 2 off.
+    if ((x > min_x && x < max_x) && (y >= max_y))
+    {
+        motor_direction->move(track_motor_one, track_motor_two, track_motor_three, 255, 0);
+        // Move robot forward.
+        //motor_direction->forward(track_motor_one, track_motor_two, track_motor_three, 255);
+    }
 
+    // Joystick is moving backward, turn on motor 1 counterclockwise and motor 3 counterclockwise. Keep motor 2 off.
+    if ((x > min_x && x < max_x) && (y <= min_y))
+    {
+        motor_direction->move(track_motor_one, track_motor_two, track_motor_three, 255, 1);
+        //motor_direction->backward(track_motor_one, track_motor_two, track_motor_three, 255);
+    }
 
-        // Joystick is moving forward, turn on motor 1 clockwise and motor 3 clockwise. Keep motor 2 off.
-        if ((x > min_x && x < max_x) && (y >= max_y))
-        {
-            // Move robot forward.
-            motor_direction->forward(track_motor_one, track_motor_two, track_motor_three, 255);
-        }
+    // Joystick is moving right, turn on all motors clockwise but spin motor 1 0.66 times the speed.
+    if ((x >= max_x) && (y > min_y && y < max_y))
+    {
+        motor_direction->move(track_motor_one, track_motor_two, track_motor_three, 255, 2);
+        //motor_direction->right(track_motor_one, track_motor_two, track_motor_three, 255);
+    }
 
-        // Joystick is moving backward, turn on motor 1 counterclockwise and motor 3 counterclockwise. Keep motor 2 off.
-        if ((x > min_x && x < max_x) && (y <= min_y))
-        {
-            motor_direction->backward(track_motor_one, track_motor_two, track_motor_three, 255);
-        }
+    // Joystick is moving left, turn on all motors counterclockwise but spin motor 3 0.66 times the speed.
+    if ((x < min_x) && ((y > min_y && y < max_y)))
+    {
+        motor_direction->move(track_motor_one, track_motor_two, track_motor_three, 255, 3);
+        //motor_direction->left(track_motor_one, track_motor_two, track_motor_three, 255);
+    }
 
-        // Joystick is moving right, turn on all motors clockwise but spin motor 1 0.66 times the speed.
-        if ((x >= max_x) && (y > min_y && y < max_y))
-        {
-            motor_direction->right(track_motor_one, track_motor_two, track_motor_three, 255);
-        }
+    // Joystick is not moving, turn all motors off.
+    if ((y >= min_y && y <= max_y) && (x >= min_x && x <= max_x))
+    {
+        // Serial.println("Joystick is not moving.");
+        motor_direction->not_moving(track_motor_one, track_motor_two, track_motor_three);
+    }
 
-        // Joystick is moving left, turn on all motors counterclockwise but spin motor 3 0.66 times the speed.
-        if ((x < min_x) && ((y > min_y && y < max_y)))
-        {
-            motor_direction->left(track_motor_one, track_motor_two, track_motor_three, 255);
-        }
+    // Rotate robot clockwise.
+    if (buttonarray[0] == 1)
+    {
+        motor_direction->move(track_motor_one, track_motor_two, track_motor_three, 255, 4);
+        //motor_direction->rotate(track_motor_one, track_motor_two, track_motor_three, 255, 0);
+    }
 
-        // rotation code here
-        // ...
-
-        // Joystick is not moving, turn all motors off.
-        if ((y >= min_y && y <= max_y) && (x >= min_x && x <= max_x))
-        {
-            //   Serial.println("Joystick is not moving.");
-            motor_direction->not_moving(track_motor_one, track_motor_two, track_motor_three);
-        }
+    // Rotate robot counterclockwise.
+    if (buttonarray[10] == 1)
+    {
+        motor_direction->move(track_motor_one, track_motor_two, track_motor_three, 255, 5);
+        //motor_direction->rotate(track_motor_one, track_motor_two, track_motor_three, 255, 1);
+    }
 }

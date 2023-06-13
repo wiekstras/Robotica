@@ -37,11 +37,37 @@ void Motor_Direction::forward(Track_Motor& motor_one, Track_Motor& motor_two, Tr
     motor_three.spin_motor(speed, 0);
 }
 
-void Motor_Direction::backward(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three, int speed)
+void Motor_Direction::move(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three, int speed, int direction)
 {
-    motor_one.spin_motor(speed, 1);
-    motor_two.spin_motor(0, 1);
-    motor_three.spin_motor(speed, 1);
+    switch (direction)
+    {
+        case 0: // Forward
+            motor_one.spin_motor(speed, 0);
+            motor_two.spin_motor(0, 0);
+            motor_three.spin_motor(speed, 0);
+        case 1: // Backward
+            motor_one.spin_motor(speed, 1);
+            motor_two.spin_motor(0, 1);
+            motor_three.spin_motor(speed, 1);
+        case 2: // Right.
+            motor_one.spin_motor(speed, 1);
+            motor_two.spin_motor(speed * 0.66, 1);
+            motor_three.spin_motor(speed, 1);
+        case 3: // Left
+            motor_one.spin_motor(speed, 0);
+            motor_two.spin_motor(speed, 0);
+            motor_three.spin_motor(speed * 0.66, 0);
+        case 4: // Rotate clockwise.
+            motor_one.spin_motor(speed, 0);
+            motor_two.spin_motor(speed, 0);
+            motor_three.spin_motor(speed, 0);
+        case 5: // Rotate counterclockwise.
+            motor_one.spin_motor(speed, 1);
+            motor_two.spin_motor(speed, 1);
+            motor_three.spin_motor(speed, 1);
+        default:
+            break;
+    }
 }
 
 void Motor_Direction::right(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three, int speed)
