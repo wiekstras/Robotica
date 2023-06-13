@@ -37,7 +37,7 @@ void Motor_Direction::forward(Track_Motor& motor_one, Track_Motor& motor_two, Tr
     motor_three.spin_motor(speed, 0);
 }
 
-void Motor_Direction::move(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three, int speed, int direction)
+/*void Motor_Direction::move(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three, int speed, int direction)
 {
     switch (direction)
     {
@@ -68,7 +68,7 @@ void Motor_Direction::move(Track_Motor& motor_one, Track_Motor& motor_two, Track
         default:
             break;
     }
-}
+}*/
 
 void Motor_Direction::right(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three, int speed)
 {
@@ -86,9 +86,18 @@ void Motor_Direction::left(Track_Motor& motor_one, Track_Motor& motor_two, Track
 
 void Motor_Direction::rotate(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three, int speed, int direction)
 {
+    int other_direction;
+    if (direction == 0)
+    {
+        other_direction = 1;
+    }
+    else
+    {
+        other_direction = 0;
+    }
     motor_one.spin_motor(speed, direction);
     motor_two.spin_motor(speed, direction);
-    motor_three.spin_motor(speed, direction);
+    motor_three.spin_motor(speed, other_direction);
 }
 
 void Motor_Direction::not_moving(Track_Motor& motor_one, Track_Motor& motor_two, Track_Motor& motor_three)
@@ -126,4 +135,11 @@ int Motor_Direction::get_min_x() const
 int Motor_Direction::get_max_x() const
 {
     return x_value_max;
+}
+
+void Motor_Direction::backward(Track_Motor &motor_one, Track_Motor &motor_two, Track_Motor &motor_three, int speed)
+{
+    motor_one.spin_motor(speed, 1);
+    motor_two.spin_motor(0, 1);
+    motor_three.spin_motor(speed, 1);
 }
