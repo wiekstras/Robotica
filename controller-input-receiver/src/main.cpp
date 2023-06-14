@@ -3,11 +3,17 @@
 #include "motor_direction.h"
 #include "speed_meter.h"
 #include <SoftwareSerial.h>
+#include "../lib/DynamixelSerial/DynamixelSerial/DynamixelSerial.h"
+
+const int RxServ_PIN = 3; // Arduino pin connected to VRX pin
+const int TxServ_PIN = 2; // Arduino pin connected to VRY pin
+const int SW_PIN = A0;  // Arduino pin connected to SW  pin
 
 const int rxPin = 5;
 const int txPin = 4;
-int joymove = 0;
+
 SoftwareSerial xBee = SoftwareSerial(rxPin, txPin);
+SoftwareSerial Gripper = SoftwareSerial(RxServ_PIN, TxServ_PIN);
 
 // Set the min and max values to decide the value range.
 Motor_Direction* motor_direction = Motor_Direction::get_instance(6, 8, 6, 8);
@@ -15,8 +21,10 @@ Motor_Direction* motor_direction = Motor_Direction::get_instance(6, 8, 6, 8);
 int grip;
 int height;
 int speedpot;
-
+int joymove = 0;
 int buttonarray[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+int limiterarray[] = {0, 1, 1, 1}; //limiters: Gripper closed (1 when reached), gripper open (0 when reached), gripper height(0,1 is high, 1,0 is low.)
+int previouslimit = 15;
 
 // Create the motor objects.
 Track_Motor track_motor_one(A1, A2);
@@ -36,6 +44,15 @@ void setup()
 {
     xBee.begin(38400);
     Serial.begin(38400);
+    Dynamixel.setSerial(reinterpret_cast<HardwareSerial *>(&Gripper));
+    Dynamixel.begin(57600, SW_PIN);
+    Dynamixel.setEndless(1,ON);
+    Dynamixel.setEndless(2,ON);
+    Dynamixel.setEndless(42,ON);
+    Dynamixel.turn (1, LEFT, 0) ;
+    Dynamixel.turn (2, LEFT, 0) ;
+    Dynamixel.turn (42, LEFT, 0) ;
+    xBee.begin(38400);
     pinMode(rxPin, INPUT);
     pinMode(txPin, OUTPUT);
     // Set connected track motor pins as output.
@@ -52,6 +69,31 @@ void setup()
  */
 void loop()
 {
+    while (Serial.available()){
+        int incomingLimit = Serial.read();
+        if(incomingLimit != previouslimit){
+            Serial.println("Limiters from raspberry:");
+            for (int i = 0; i < 4; i++){
+                limiterarray[i] = incomingLimit>>i%4 & 1; //afbouwen van de waardes die we versturen. Bits shiften x4 om de waardes weer er uit te halen.
+                Serial.print("Limiter: ");
+                Serial.print(i);
+                Serial.print("Status: ");
+                Serial.println(limiterarray[i]);
+            }
+            if (limiterarray[0] == 1 || limiterarray[1] == 0){
+                Gripper.listen();
+                Dynamixel.turn(42,LEFT, 0);
+                xBee.listen();
+            }
+            if ((limiterarray[2] == 1 && limiterarray[3] == 0) || (limiterarray[2] == 0 && limiterarray[3] == 1)){
+                Gripper.listen();
+                Dynamixel.turn(1,LEFT, 0);
+                Dynamixel.turn(2,LEFT, 0);
+                xBee.listen();
+            }
+            previouslimit = incomingLimit;
+        }
+    }
     joymove = 0;
     while (xBee.available())
     {
@@ -82,15 +124,38 @@ void loop()
                 grip = incomingInt - 48;
                 Serial.print("Grip:");
                 Serial.println(grip);
+                Gripper.listen();
+                if (grip < 7 && limiterarray[0] == 0){
+                    Dynamixel.turn(42,RIGTH, (512-grip*64));
+                }
+                if (grip > 7 && limiterarray[1] == 1){
+                    Dynamixel.turn(42,LEFT, (grip*64 - 512));
+                }
+                xBee.listen();
                 break;
 
             case 64 ... 79://0100 XXXX, GRIPPER HEIGHT VALUE
                 height = incomingInt - 64;
                 Serial.print("Height:");
                 Serial.println(height);
+                Gripper.listen();
+                if (height < 7){
+                    Dynamixel.turn(1,RIGTH, (512-height*64));
+                    Dynamixel.turn(2,LEFT, (512-height*64));
+                }
+                if (height > 7){
+                    Dynamixel.turn(1,LEFT, (height*64 - 512));
+                    Dynamixel.turn(2,RIGTH, (height*64 - 512));
+                }
+                xBee.listen();
                 break;
 
             case 80 ... 95://0101 XXXX, SPEEDPOT VALUE
+                speedpot = incomingInt - 80;
+                Serial.print("Speed:");
+                Serial.println(speedpot);
+                break;
+                case 80 ... 95://0101 XXXX, SPEEDPOT VALUE
                 speedpot = incomingInt - 80;
                 Serial.print("Speed:");
                 Serial.println(speedpot);
