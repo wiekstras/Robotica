@@ -3,9 +3,21 @@
 #include "motor_direction.h"
 #include "speed_meter.h"
 #include <SoftwareSerial.h>
+#include "DynamixelSerial.h"
 
 const int rxPin = 5;
 const int txPin = 4;
+
+const int RxServ_PIN = 3; // Arduino pin connected to VRX pin
+const int TxServ_PIN = 2; // Arduino pin connected to VRY pin
+const int SW_PIN = A0;
+
+
+SoftwareSerial Gripper = SoftwareSerial(RxServ_PIN, TxServ_PIN);
+
+//limiters: Gripper closed (1 when reached), gripper open (0 when reached), gripper height(0,1 is high, 1,0 is low.)
+int limiterarray[] = {0, 1, 1, 1};
+
 int joymove = 0;
 SoftwareSerial xBee = SoftwareSerial(rxPin, txPin);
 
@@ -19,7 +31,7 @@ int speedpot;
 int buttonarray[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 // Create the motor objects.
-Track_Motor track_motor_one(A1, A2);
+Track_Motor track_motor_one(A2, A1);
 Track_Motor track_motor_two(6, A3);
 Track_Motor track_motor_three(7, 8);
 
@@ -34,6 +46,15 @@ bool received_numbers = false;
  */
 void setup()
 {
+    Dynamixel.setSerial(reinterpret_cast<HardwareSerial *>(&Gripper));
+    Dynamixel.begin(57600, SW_PIN);
+    Dynamixel.setEndless(1,ON);
+    Dynamixel.setEndless(2,ON);
+    Dynamixel.setEndless(42,ON);
+    Dynamixel.turn (1, LEFT, 0) ;
+    Dynamixel.turn (2, LEFT, 0) ;
+    Dynamixel.turn (42, LEFT, 0) ;
+
     xBee.begin(38400);
     Serial.begin(38400);
     pinMode(rxPin, INPUT);
@@ -91,6 +112,7 @@ void loop()
                 speedpot = incomingInt - 80;
                 Serial.print("Speed:");
                 Serial.println(speedpot);
+                speed_meter->set_speed(speedpot);
                 break;
 
             case 96 ... 111: //0110 1/2/3/4, BUTTONS 1-4 VALUES
@@ -151,9 +173,38 @@ void loop()
     int max_x = motor_direction->get_max_x();
     int min_y = motor_direction->get_min_y();
     int max_y = motor_direction->get_max_y();
+    int speed = speed_meter->get_speed();
 
-    speed_meter->set_speed(speedpot);
+    Gripper.listen();
 
+    // Turn gripper right
+    if (grip < 7 && limiterarray[0] == 0)
+    {
+        Dynamixel.turn(42,RIGTH, (512-grip*64));
+    }
+
+    // Turn gripper left
+    if (grip > 7 && limiterarray[1] == 1)
+    {
+        Dynamixel.turn(42,LEFT, (grip*64 - 512));
+    }
+
+    // Turn gripper down?
+    if (height < 7)
+    {
+        Dynamixel.turn(1,RIGTH, (512-height*64));
+        Dynamixel.turn(2,LEFT, (512-height*64));
+    }
+
+    // Turn gripper up?
+    if (height > 7)
+    {
+        Dynamixel.turn(1,LEFT, (height*64 - 512));
+        Dynamixel.turn(2,RIGTH, (height*64 - 512));
+    }
+
+    xBee.listen();
+    
     // Joystick is moving forward, turn on motor 1 clockwise and motor 3 clockwise. Keep motor 2 off.
     if ((x > min_x && x < max_x) && (y >= max_y))
     {
@@ -195,11 +246,6 @@ void loop()
     {
         //motor_direction->move(track_motor_one, track_motor_two, track_motor_three, 255, 4);
         motor_direction->rotate(track_motor_one, track_motor_two, track_motor_three, 255, 0);
-    }
-
-    if (buttonarray[1] == 1)
-    {
-        motor_direction->not_moving(track_motor_one, track_motor_two, track_motor_three);
     }
 
     // Rotate robot counterclockwise.

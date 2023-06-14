@@ -14,9 +14,9 @@ Speed_Meter* Speed_Meter::get_instance()
     return speed_meter;
 }
 
-void Speed_Meter::set_speed(int analogValue)
+void Speed_Meter::set_speed(int analog)
 {
-    speed = map(analogValue, 0, 15, 0, 255);
+    speed = map(analog, 0, 14, 0, 255);
 }
 
 int Speed_Meter::get_speed()
